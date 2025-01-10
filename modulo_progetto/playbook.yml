@@ -1,0 +1,6 @@
+---
+- name: Configure role for the nodes
+  hosts: all
+  become: true
+  roles:
+    - sou_podman

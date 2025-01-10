@@ -1,0 +1,111 @@
+---
+- name: installing podman
+  package:
+    name: "podman"
+    state: present
+  when: node_name in ["soufe1", "soube2"]
+
+- name: create a directory for soufe1
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop:
+    - { path: /etc/haproxy, mode: '0755' }
+    - { path: /etc/haproxy/certs, mode: '0755' }
+    - { path: /var/log/haproxy, mode: '0755' }
+  when: node_name == "soufe1" and node_role == "haproxy"
+
+- name: generate configuration file
+  template:
+    src: /Users/francescogalanti/sou-lab-cni/modulo_progetto/roles/sou_podman/templates/haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root 
+    group: root
+    mode: 0644
+  when: node_name == "soufe1" and node_role == "haproxy"
+
+- name: pull image for haproxy
+  podman_image:
+    name: docker.io/library/haproxy
+  when: node_name == "soufe1" and node_role == "haproxy"
+
+- name: create haproxy container
+  containers.podman.podman_container:
+    name: haproxy
+    image: haproxy
+    state: started
+    user: root
+    ports: 
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/etc/haproxy:/usr/local/etc/haproxy:Z"
+  when: node_name == "soufe1" and node_role == "haproxy"
+
+- name: create a directory for soube2
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop:
+    - { path: /etc/prometheus, mode: '0755' }
+    - { path: /var/lib/prometheus, mode: '0755' }
+    - { path: /etc/grafana, mode: '0755' }
+    - { path: /var/lib/grafana, mode: '0755' }
+  when: node_name == "soube2" and node_role == "prometheus_grafana"
+
+- name: generate configuration file for prometheus
+  template:
+    src: /Users/francescogalanti/sou-lab-cni/modulo_progetto/roles/sou_podman/templates/prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    owner: root 
+    group: root
+    mode: 0644
+  when: node_name == "soube2" and node_role == "prometheus_grafana"
+
+- name: pull prometheus image
+  podman_image:
+    name: docker.io/prom/prometheus
+  when: node_name == "soube2" and node_role == "prometheus_grafana"
+
+- name: create prometheus container
+  containers.podman.podman_container:
+    name: prometheus
+    image: docker.io/prom/prometheus:latest
+    state: started
+    restart_policy: always
+    ports:
+      - "9090:9090"
+    volumes: "/etc/prometheus:/etc/prometheus:Z"
+  when: node_name == "soube2" and node_role == "prometheus_grafana"
+
+- name: generate configuration file for grafana
+  template:
+    src: /Users/francescogalanti/sou-lab-cni/modulo_progetto/roles/sou_podman/templates/grafana.ini.j2
+    dest: /etc/grafana/grafana.ini
+    owner: root 
+    group: root
+    mode: 0644
+  when: node_name == "soube2" and node_role == "prometheus_grafana"
+
+- name: pull grafana image
+  podman_image:
+    name: docker.io/grafana/grafana
+  when: node_name == "soube2" and node_role == "prometheus_grafana"
+
+- name: create grafana container
+  containers.podman.podman_container:
+    name: grafana
+    image: grafana/grafana
+    state: started
+    restart_policy: always
+    ports: 
+      - "3000:3000"
+    volumes:
+      - "/etc/grafana:/etc/grafana:Z"
+  when: node_name == "soube2" and node_role == "prometheus_grafana"

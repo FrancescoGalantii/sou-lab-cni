@@ -1,0 +1,11 @@
+all:
+  hosts:
+    soufe1:
+      ansible_host: 192.168.10.10
+      node_name: soufe1
+      node_role: haproxy  
+    soube2:
+      ansible_host: 192.168.10.20
+      node_name: soube2
+      node_role: prometheus_grafana  
+

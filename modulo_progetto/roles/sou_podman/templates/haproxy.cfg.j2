@@ -1,0 +1,26 @@
+global
+    log stdout format raw local0
+    maxconn 4096
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    timeout connect 5000ms
+    timeout client  50000ms
+    timeout server  50000ms
+
+frontend http_front
+    bind *:80
+    acl grafana_path path_beg /grafana
+    acl prometheus_path path_beg /prometheus
+    use_backend grafana_back if grafana_path
+    use_backend prometheus_back if prometheus_path
+    default_backend grafana_back
+
+backend grafana_back
+    server grafana 192.168.10.20:3000
+
+backend prometheus_back
+    server prometheus 192.168.10.10:9090

@@ -1,0 +1,25 @@
+# -*- mode: ruby -*-
+# vi:set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+ config.vm.define "soufe1" do |soufe1|
+  soufe1.vm.box = "rockylinux/9"
+  soufe1.vm.network "private_network", ip: "192.168.10.10"
+  soufe1.vm.hostname = "soufe1"
+  soufe1.vm.provision "ansible" do |ansible|
+    ansible.playbook = "playbook.yml"
+    ansible.inventory_path = "./inventory.yml"
+  end
+ end
+
+ config.vm.define "soube2" do |soube2|
+  soube2.vm.box = "rockylinux/9"
+  soube2.vm.network "private_network", ip: "192.168.10.20"
+  soube2.vm.hostname = "soube2"
+  soube2.vm.provision "ansible" do |ansible|
+    ansible.playbook = "playbook.yml"
+    ansible.inventory_path = "./inventory.yml"
+  end
+ end
+end
