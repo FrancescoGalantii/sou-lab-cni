@@ -21,8 +21,10 @@ frontend http_front
 
 backend grafana_back
     mode http
+    balance roundrobin
     server grafana 192.168.10.20:3000
 
 backend prometheus_back
     mode http
+    balance roundrobin
     server prometheus 192.168.10.20:9090
