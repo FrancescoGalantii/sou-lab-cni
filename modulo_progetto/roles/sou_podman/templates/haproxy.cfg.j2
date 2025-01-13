@@ -13,18 +13,18 @@ defaults
 
 frontend http_front
     bind *:80
-    acl grafana_path path_beg /grafana
-    acl prometheus_path path_beg /prometheus
-    use_backend grafana_back if grafana_path
-    use_backend prometheus_back if prometheus_path
-    default_backend grafana_back
+    acl is_grafana hdr(host) -i grafana.local
+    use_backend grafana if is_grafana
 
-backend grafana_back
+    acl is_prometheus hdr(host) -i prometheus.local
+    use_backend prometheus if is_prometheus
+
+backend grafana
     mode http
     balance roundrobin
     server grafana 192.168.10.20:3000
 
-backend prometheus_back
+backend prometheus
     mode http
     balance roundrobin
     server prometheus 192.168.10.20:9090
