@@ -1,5 +1,7 @@
-# `sou-lab-cni
-Questa repository contiene il progetto "sou-lab-cni" che ha l'obiettivo di creare un ambiente virtuale multinodo utilizzando Vagrant, Ansible, Podman e HAProxy. L'architettura prevede due nodi:
+# `sou-lab-cni`
+Questa repository contiene il progetto "sou-lab-cni" che ha l'obiettivo di creare un ambiente virtuale multinodo utilizzando Vagrant, Ansible, Podman e HAProxy. 
+
+L'architettura prevede due nodi:
 
 - **soufe1**: Nodo frontend che funge da reverse proxy utilizzando HAProxy.
 ```vagrantfile
@@ -51,8 +53,8 @@ I nodi sono configurati per comunicare su una rete privata. Gli indirizzi IP ass
 - **soufe1**: `192.168.10.10`
 - **soube2**: `192.168.10.20`
 ---
- ## passaggi aggiuntivi 
- Per poter far si che HAProxy svolga il compito di reverse proxy e permetta l'accesso a Prometheus e Grafana devi modificare il file /etc/hosts per creare un DNS locale e quindi un'associazione tra ip del nodo ospitante Prometheus e Grafana con il nome di dominio che preferisci per i due Server.
+## passaggi aggiuntivi 
+Per poter far si che HAProxy svolga il compito di reverse proxy e permetta l'accesso a Prometheus e Grafana devi modificare il file /etc/hosts per creare un DNS locale e quindi un'associazione tra ip del nodo ospitante Prometheus e Grafana con il nome di dominio che preferisci per i due Server.
 
  ---
  ## Requisiti
