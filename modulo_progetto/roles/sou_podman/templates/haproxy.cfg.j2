@@ -20,7 +20,9 @@ frontend http_front
     default_backend grafana_back
 
 backend grafana_back
+    mode http
     server grafana 192.168.10.20:3000
 
 backend prometheus_back
+    mode http
     server prometheus 192.168.10.20:9090

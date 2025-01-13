@@ -43,6 +43,7 @@
       - "443:443"
     volumes:
       - "/etc/haproxy:/usr/local/etc/haproxy:Z"
+      - "/var/log/haproxy:/var/log/haproxy:Z"
   when: node_name == "soufe1" and node_role == "haproxy"
 
 - name: create a directory for soube2
@@ -81,7 +82,9 @@
     restart_policy: always
     ports:
       - "9090:9090"
-    volumes: "/etc/prometheus:/etc/prometheus:Z"
+    volumes: 
+      - "/etc/prometheus:/etc/prometheus:Z"
+      - "/var/lib/prometheus:/var/lib/prometheus:Z"
   when: node_name == "soube2" and node_role == "prometheus_grafana"
 
 - name: generate configuration file for grafana
