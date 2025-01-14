@@ -10,7 +10,7 @@
     name: python3-cryptography
     state: present
   when: node_name == "soufe1" and node_role == "haproxy"
-- name: create a directory for soufe1
+- name: create directories for soufe1
   file:
     path: "{{ item.path }}"
     state: directory
@@ -26,7 +26,7 @@
     - { path: /etc/ssl/csr, mode: '0755' }
   when: node_name == "soufe1" and node_role == "haproxy"
 
-- name: generate configuration file
+- name: generate HAProxy configuration file
   template:
     src: haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
@@ -86,7 +86,7 @@
       - "/etc/ssl/crt:/usr/local/etc/haproxy/certs:Z"
   when: node_name == "soufe1" and node_role == "haproxy"
 
-- name: create a directory for soube2
+- name: create directories for soube2
   file:
     path: "{{ item.path }}"
     state: directory
@@ -100,7 +100,7 @@
     - { path: /var/lib/grafana, mode: '0755' }
   when: node_name == "soube2" and node_role == "prometheus_grafana"
 
-- name: generate configuration file for prometheus
+- name: generate prometheus configuration file
   template:
     src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml
@@ -114,7 +114,7 @@
     name: docker.io/prom/prometheus
   when: node_name == "soube2" and node_role == "prometheus_grafana"
 
-- name: create prometheus container
+- name: create Prometheus container
   containers.podman.podman_container:
     name: prometheus
     image: docker.io/prom/prometheus:latest
@@ -127,7 +127,7 @@
       - "/var/lib/prometheus:/var/lib/prometheus:Z"
   when: node_name == "soube2" and node_role == "prometheus_grafana"
 
-- name: generate configuration file for grafana
+- name: generate Grafana configuration file 
   template:
     src: grafana.ini.j2
     dest: /etc/grafana/grafana.ini
