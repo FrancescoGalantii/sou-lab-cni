@@ -5,6 +5,11 @@
     state: present
   when: node_name in ["soufe1", "soube2"]
 
+- name: Install Python cryptography
+  package:
+    name: python3-cryptography
+    state: present
+  when: node_name == "soufe1" and node_role == "haproxy"
 - name: create a directory for soufe1
   file:
     path: "{{ item.path }}"
@@ -16,15 +21,49 @@
     - { path: /etc/haproxy, mode: '0755' }
     - { path: /etc/haproxy/certs, mode: '0755' }
     - { path: /var/log/haproxy, mode: '0755' }
+    - { path: /etc/ssl/crt, mode: '0755' }
+    - { path: /etc/ssl/private, mode: '0755' }
+    - { path: /etc/ssl/csr, mode: '0755' }
   when: node_name == "soufe1" and node_role == "haproxy"
 
 - name: generate configuration file
   template:
-    src: /Users/francescogalanti/sou-lab-cni/modulo_progetto/roles/sou_podman/templates/haproxy.cfg.j2
+    src: haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
     owner: root 
     group: root
     mode: 0644
+  when: node_name == "soufe1" and node_role == "haproxy"
+
+- name: Generate a private key for HAProxy
+  openssl_privatekey:
+    path: /etc/ssl/private/haproxy.pem
+    cipher: auto
+    size: 2048
+  when: node_name == "soufe1" and node_role == "haproxy"
+
+- name: Generate a CSR for HAProxy
+  openssl_csr:
+    path: /etc/ssl/csr/haproxy.csr
+    privatekey_path: /etc/ssl/private/haproxy.pem
+    common_name: "haproxy.local"
+    country_name: "IT"
+    organization_name: "Sourcesense"
+    state_or_province_name: "Lazio"
+  when: node_name == "soufe1" and node_role == "haproxy"
+
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: /etc/ssl/crt/haproxy.crt
+    privatekey_path: /etc/ssl/private/haproxy.pem
+    csr_path: /etc/ssl/csr/haproxy.csr
+    provider: selfsigned
+  when: node_name == "soufe1" and node_role == "haproxy"
+
+- name: Create concatenated certificate
+  shell: cat /etc/ssl/private/haproxy.pem /etc/ssl/crt/haproxy.crt > /etc/ssl/crt/haproxy.pem
+  args:
+    executable: /bin/bash
   when: node_name == "soufe1" and node_role == "haproxy"
 
 - name: pull image for haproxy
@@ -44,6 +83,7 @@
     volumes:
       - "/etc/haproxy:/usr/local/etc/haproxy:Z"
       - "/var/log/haproxy:/var/log/haproxy:Z"
+      - "/etc/ssl/crt:/usr/local/etc/haproxy/certs:Z"
   when: node_name == "soufe1" and node_role == "haproxy"
 
 - name: create a directory for soube2
