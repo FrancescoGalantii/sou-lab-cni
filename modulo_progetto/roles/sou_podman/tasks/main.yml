@@ -102,7 +102,7 @@
 
 - name: generate configuration file for prometheus
   template:
-    src: /Users/francescogalanti/sou-lab-cni/modulo_progetto/roles/sou_podman/templates/prometheus.yml.j2
+    src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml
     owner: root 
     group: root
@@ -129,7 +129,7 @@
 
 - name: generate configuration file for grafana
   template:
-    src: /Users/francescogalanti/sou-lab-cni/modulo_progetto/roles/sou_podman/templates/grafana.ini.j2
+    src: grafana.ini.j2
     dest: /etc/grafana/grafana.ini
     owner: root 
     group: root
